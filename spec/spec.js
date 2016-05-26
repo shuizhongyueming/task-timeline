@@ -19,6 +19,7 @@ describe('timeline', function(){
     xdescribe('garbage collection', function(){
         it('will remove node which has a state of false from list');
         it('will stop tick if list is empty');
+        it('will call the destroy method if provide');
     });
     xdescribe('stop', function(){
         it('will stop the tick');

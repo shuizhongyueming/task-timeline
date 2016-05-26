@@ -1,0 +1,23 @@
+{
+  "name": "timeline",
+  "version": "0.1.0",
+  "description": "a tool for time based action and animation",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shuizhongyueming/timeline.git"
+  },
+  "keywords": [
+    "timeline",
+    "animation"
+  ],
+  "author": "shuizhongyueming@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shuizhongyueming/timeline/issues"
+  },
+  "homepage": "https://github.com/shuizhongyueming/timeline#readme"
+}

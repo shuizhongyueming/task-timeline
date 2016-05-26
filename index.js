@@ -109,6 +109,7 @@ function add(node){
         list.push(node);
         listLen++;
 
+
         // only started and before this add there is no node in the list
         if (listLen === 1 && isTimelineStarted) {
             run();
@@ -124,6 +125,9 @@ function garbageCollect(){
     for (i = listLen - 1; i >= 0; i--) {
         node = list[i];
         if (node.state === STATE_DIE) {
+            if (node.destroy) {
+                node.destroy();
+            }
             list.splice(i, 1);
         }
     }
@@ -134,11 +138,23 @@ function garbageCollect(){
     }
 }
 
+function clear(){
+    stop();
+    list = [];
+    listLen = 0;
+}
+
 module.exports = {
     start: start,
     add: add,
     stop: stop,
+    clear: clear,
     STATE_LIVE: STATE_LIVE,
     STATE_PENDING: STATE_PENDING,
-    STATE_DIE: STATE_DIE
+    STATE_DIE: STATE_DIE,
+
+    // for test
+    _tick: tick,
+    _getList: function(){return list;},
+    _getIntervalTime: function(){return intervalTime}
 };

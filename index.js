@@ -138,6 +138,57 @@ function garbageCollect(){
     }
 }
 
+// a window.setInterval like func
+function intervalSet(cb, timeInterval){
+    var time =  new Date(),
+        id = time.valueOf();
+    timeline.add({
+        id: id,
+        state: STATE_LIVE,
+        data: {
+            token: id,
+            time: id,
+            timeInterval: timeInterval
+        },
+        tick: function(node, timeNow, timeObj){
+            if (timeNow - node.data.time >= node.data.timeInterval) {
+                cb();
+            }
+            node.data.time = timeNow;
+        };
+    });
+}
+
+// a window.clearInterval like func
+function intervalClear(id){
+    var node = findNodeWithId(id);
+
+    if (node) {
+        node.state = STATE_DIE;
+    }
+}
+
+// a window.setTimeout like func
+function timeoutSet(cb, timeInterval){
+    var time =  new Date(),
+        id = time.valueOf();
+    timeline.add({
+        id: id,
+        state: STATE_LIVE,
+        data: {
+            token: id,
+            time: id,
+            timeInterval: timeInterval
+        },
+        tick: function(node, timeNow, timeObj){
+            if (timeNow - node.data.time >= node.data.timeInterval) {
+                cb();
+                intervalClear(node.token);
+            }
+        };
+    });
+}
+
 function clear(){
     stop();
     list = [];
@@ -152,6 +203,11 @@ module.exports = {
     STATE_LIVE: STATE_LIVE,
     STATE_PENDING: STATE_PENDING,
     STATE_DIE: STATE_DIE,
+
+    setTimeout: setTimeout,
+    setInterval: setInterval,
+    clearTimeout: clearInterval,
+    clearInterval: clearInterval,
 
     // for test
     _tick: tick,

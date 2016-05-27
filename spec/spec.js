@@ -232,4 +232,47 @@ describe('timeline', function(){
             }, timeline._getIntervalTime() * 4);
         });
     });
+
+    describe('system like time func', function(){
+        it('interval', function(done){
+
+            var token = timeline.setInterval(fakeFunc, 200);
+
+            setTimeout(function(){
+                var count = fakeFunc.calls.count(); 
+
+                expect(count).toBeGreaterThan(1);
+
+                timeline.clearInterval(token);
+
+
+                setTimeout(function(){
+                    expect(fakeFunc.calls.count()).toBe(count);
+                    done();
+                }, 400)
+
+            }, 500)
+        });
+
+        it('set timeout', function(done){
+            var token = timeline.setTimeout(fakeFunc, 200);
+            setTimeout(function(){
+                expect(fakeFunc.calls.count()).toBe(1);
+                done();
+            }, 500)
+        });
+
+        it('clear timeout', function(done){
+            var token = timeline.setTimeout(fakeFunc, 200);
+
+            setTimeout(function(){
+                timeline.clearTimeout(token);
+            },50);
+
+            setTimeout(function(){
+                expect(fakeFunc).not.toHaveBeenCalled();
+                done();
+            }, 500)
+        })
+    });
 });

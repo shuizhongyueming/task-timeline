@@ -139,10 +139,12 @@ function garbageCollect(){
 }
 
 // a window.setInterval like func
+// but the timeInterval small than intervalTime will not work
 function intervalSet(cb, timeInterval){
     var time =  new Date(),
         id = time.valueOf();
-    timeline.add({
+
+    add({
         id: id,
         state: STATE_LIVE,
         data: {
@@ -153,10 +155,12 @@ function intervalSet(cb, timeInterval){
         tick: function(node, timeNow, timeObj){
             if (timeNow - node.data.time >= node.data.timeInterval) {
                 cb();
+                node.data.time = timeNow;
             }
-            node.data.time = timeNow;
-        };
+        }
     });
+    start();
+    return id;
 }
 
 // a window.clearInterval like func
@@ -169,10 +173,11 @@ function intervalClear(id){
 }
 
 // a window.setTimeout like func
+// but the timeInterval small than intervalTime will not work
 function timeoutSet(cb, timeInterval){
     var time =  new Date(),
         id = time.valueOf();
-    timeline.add({
+    add({
         id: id,
         state: STATE_LIVE,
         data: {
@@ -183,10 +188,12 @@ function timeoutSet(cb, timeInterval){
         tick: function(node, timeNow, timeObj){
             if (timeNow - node.data.time >= node.data.timeInterval) {
                 cb();
-                intervalClear(node.token);
+                intervalClear(node.id);
             }
-        };
+        }
     });
+    start();
+    return id;
 }
 
 function clear(){
@@ -204,10 +211,10 @@ module.exports = {
     STATE_PENDING: STATE_PENDING,
     STATE_DIE: STATE_DIE,
 
-    setTimeout: setTimeout,
-    setInterval: setInterval,
-    clearTimeout: clearInterval,
-    clearInterval: clearInterval,
+    setTimeout: timeoutSet,
+    setInterval: intervalSet,
+    clearTimeout: intervalClear,
+    clearInterval: intervalClear,
 
     // for test
     _tick: tick,

@@ -1,6 +1,6 @@
 var list = [],
     listLen = 0,
-    intervalTime = 100,
+    intervalTime = 1000/60,
     intervalToken = 0,
     isTimelineStarted = false,
     STATE_LIVE = 'live',
@@ -154,7 +154,7 @@ function intervalSet(cb, timeInterval){
         },
         tick: function(node, timeNow, timeObj){
             if (timeNow - node.data.time >= node.data.timeInterval) {
-                cb();
+                cb(node, timeNow, timeObj);
                 node.data.time = timeNow;
             }
         }
@@ -187,7 +187,7 @@ function timeoutSet(cb, timeInterval){
         },
         tick: function(node, timeNow, timeObj){
             if (timeNow - node.data.time >= node.data.timeInterval) {
-                cb();
+                cb(node, timeNow, timeObj);
                 intervalClear(node.id);
             }
         }

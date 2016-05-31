@@ -1,5 +1,5 @@
 {
-  "name": "timeline",
+  "name": "task-timeline",
   "version": "0.1.0",
   "description": "a tool for time based action and animation",
   "main": "index.js",

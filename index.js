@@ -1,5 +1,4 @@
 var list = [],
-    listLen = 0,
     intervalTime = 1000/60,
     intervalToken = 0,
     isTimelineStarted = false,
@@ -21,7 +20,8 @@ function isEmpty(list){
  */
 function findNodeWithId(id){
     var i,
-        node = null;
+        node = null,
+        listLen = list.length;
 
     if (listLen === 0) {
         return node;
@@ -75,7 +75,8 @@ function tick(){
     var i = 0,
         node = null,
         currTime = new Date(),
-        currTimeNum = currTime.valueOf();
+        currTimeNum = currTime.valueOf(),
+        listLen = list.length;
 
 
     try{
@@ -107,11 +108,9 @@ function add(node){
 
     if (findNodeWithId(node.id) === null && node.state === STATE_LIVE) {
         list.push(node);
-        listLen++;
-
 
         // only started and before this add there is no node in the list
-        if (listLen === 1 && isTimelineStarted) {
+        if (list.length === 1 && isTimelineStarted) {
             run();
         }
     }
@@ -119,7 +118,8 @@ function add(node){
 
 function garbageCollect(){
     var i,
-        node = null;
+        node = null,
+        listLen = list.length;
 
     // loop from the end, so the splice will not break the list's index
     for (i = listLen - 1; i >= 0; i--) {
@@ -199,7 +199,6 @@ function timeoutSet(cb, timeInterval){
 function clear(){
     stop();
     list = [];
-    listLen = 0;
 }
 
 module.exports = {

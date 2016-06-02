@@ -142,14 +142,15 @@ function garbageCollect(){
 // but the timeInterval small than intervalTime will not work
 function intervalSet(cb, timeInterval){
     var time =  new Date(),
-        id = time.valueOf();
+        logTime = time.valueOf(),
+        id = makeUniqueId(logTime);
 
     add({
         id: id,
         state: STATE_LIVE,
         data: {
             token: id,
-            time: id,
+            time: logTime,
             timeInterval: timeInterval
         },
         tick: function(node, timeNow, timeObj){
@@ -172,17 +173,27 @@ function intervalClear(id){
     }
 }
 
+/**
+ * can't just use the time number as unique id
+ * because in chrome, some time, if two timeoutSet closely, the time number will be same
+ */
+function makeUniqueId(timeNum){
+    return 'time' + timeNum + 'random' + Math.random();
+}
+
 // a window.setTimeout like func
 // but the timeInterval small than intervalTime will not work
 function timeoutSet(cb, timeInterval){
     var time =  new Date(),
-        id = time.valueOf();
+        logTime = time.valueOf(),
+        id = makeUniqueId(logTime);
+
     add({
         id: id,
         state: STATE_LIVE,
         data: {
             token: id,
-            time: id,
+            time: logTime,
             timeInterval: timeInterval
         },
         tick: function(node, timeNow, timeObj){

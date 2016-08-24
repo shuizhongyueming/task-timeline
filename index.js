@@ -1,5 +1,5 @@
 var list = [],
-    intervalTime = 1000/60,
+    intervalTime = 1000,
     intervalToken = 0,
     isTimelineStarted = false,
     STATE_LIVE = 'live',
@@ -29,7 +29,7 @@ function findNodeWithId(id){
 
     for (i = 0; i < listLen; i++) {
         if (list[i].id === id) {
-            return list[i]
+            return list[i];
         }
     }
 
@@ -51,13 +51,9 @@ function checkRequire(obj, requires){
     }
 }
 
-function start(time){
+function start(){
     if (isTimelineStarted) {
         return;
-    }
-
-    if (time) {
-        intervalTime = time;
     }
 
     isTimelineStarted = true;
@@ -68,7 +64,21 @@ function start(time){
 }
 
 function run(){
-    intervalToken = setInterval(tick, intervalTime);
+
+    // if intervalToken !== 0 means there is a count going
+    // same time only one count will run
+    if (intervalToken !== 0) {
+        return;
+    }
+    intervalToken = setTimeout(_run, intervalTime);
+}
+
+function _run(){
+    intervalToken = 0;
+    tick();
+    if (garbageCollect()) {
+        run();
+    }
 }
 
 function tick(){
@@ -90,7 +100,6 @@ function tick(){
         // do nothing
     }
 
-    garbageCollect();
 }
 
 function stop(){
@@ -98,7 +107,7 @@ function stop(){
     isTimelineStarted = false;
 
     if (intervalToken !== 0) {
-        clearInterval(intervalToken);
+        clearTimeout(intervalToken);
         intervalToken = 0;
     }
 }
@@ -110,12 +119,16 @@ function add(node){
         list.push(node);
 
         // only started and before this add there is no node in the list
-        if (list.length === 1 && isTimelineStarted) {
+        if (list.length === 1) {
             run();
         }
     }
 }
 
+/**
+ * clear the unnecessary node
+ * @return {Boolean} false the timeline is stop; true the timeline will continue
+ */
 function garbageCollect(){
     var i,
         node = null,
@@ -134,13 +147,15 @@ function garbageCollect(){
 
     if (isEmpty(list)) {
         stop();
-        return;
+        return false;
     }
+
+    return true;
 }
 
 // a window.setInterval like func
-// but the timeInterval small than intervalTime will not work
-function intervalSet(cb, timeInterval){
+// but timeInterval will always same as 1000ms
+function intervalSet(cb ,timeInterval){
     var time =  new Date(),
         logTime = time.valueOf(),
         id = makeUniqueId(logTime);
@@ -151,7 +166,7 @@ function intervalSet(cb, timeInterval){
         data: {
             token: id,
             time: logTime,
-            timeInterval: timeInterval
+            timeInterval: timeInterval * 1000
         },
         tick: function(node, timeNow, timeObj){
             if (timeNow - node.data.time >= node.data.timeInterval) {
@@ -194,7 +209,7 @@ function timeoutSet(cb, timeInterval){
         data: {
             token: id,
             time: logTime,
-            timeInterval: timeInterval
+            timeInterval: timeInterval * 1000
         },
         tick: function(node, timeNow, timeObj){
             if (timeNow - node.data.time >= node.data.timeInterval) {
@@ -229,5 +244,11 @@ module.exports = {
     // for test
     _tick: tick,
     _getList: function(){return list;},
-    _getIntervalTime: function(){return intervalTime}
+    _getIntervalTime: function(){return intervalTime;},
+    _logSt: function(){
+        console.log('list', list);
+        console.log('intervalTime', intervalTime);
+        console.log('intervalToken', intervalToken);
+        console.log('isTimelineStarted', isTimelineStarted);
+    }
 };

@@ -6,7 +6,7 @@ and this is the [article](https://mp.weixin.qq.com/s?__biz=MzIzMzEzODYwOA==&mid=
 
 ## About
 
-this tool is suitable for some project with many time based action or animation.
+this tool is suitable for some project with many time(second not minisecond) based action or animation.
 
 too many setTimeout and setInterval will drop down the page's performace.
 

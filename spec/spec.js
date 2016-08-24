@@ -1,9 +1,9 @@
 var timeline = require('../index');
 describe('timeline', function(){
     beforeEach(function(){
-        timeline.clear();
-        timeline.start(100);
+        timeline.start();
         timeline.stop();
+        timeline.clear();
     });
     var fakeFunc = null, node = null;
 
@@ -21,7 +21,8 @@ describe('timeline', function(){
 
     afterEach(function(){
         timeline.stop();
-    })
+        timeline.clear();
+    });
     describe('function add', function(){
 
         it('can add node and excute it every tick', function(done){
@@ -104,7 +105,7 @@ describe('timeline', function(){
              * if start not call run, but the first added node call
              * the time between add node and call tick will not less than intervalTime
              */
-            timeline.start(200);
+            timeline.start();
             setTimeout(function(){
                 node.tick = function(node, timeNum, timeObj) {
                     node.state = timeline.STATE_DIE;
@@ -119,27 +120,21 @@ describe('timeline', function(){
         });
     });
     describe('function start', function(){
-        it('if not start, node will not excute', function(done){
+        it('if not start, node will excute with add', function(done){
+            timeline.clear();
+            var node = {
+                id: 'test-for-func-start',
+                state: timeline.STATE_LIVE,
+                tick: function(node, timeNum, timeObj) {
+                    node.state = timeline.STATE_DIE;
+                }
+            };
             spyOn(node, 'tick');
             timeline.add(node);
-            setTimeout(function(){
-                expect(node.tick).not.toHaveBeenCalled();
-                done();
-            }, timeline._getIntervalTime()*2);
-        });
-        it('can set start with param to set interval', function(done){
-            var originTime = timeline._getIntervalTime(),
-                time = originTime * 2;
-            spyOn(node, 'tick');
-            timeline.start(time);
-            timeline.add(node);
-            setTimeout(function(){
-                expect(node.tick).not.toHaveBeenCalled();
-            }, originTime);
             setTimeout(function(){
                 expect(node.tick).toHaveBeenCalled();
                 done();
-            }, time);
+            }, timeline._getIntervalTime()*2);
         });
     });
     describe('node tick', function(){
@@ -163,8 +158,8 @@ describe('timeline', function(){
                 expect(node.id).toBeDefined();
                 expect(node.state).toBeDefined();
                 expect(node.tick).toBeDefined();
-                expect(timeNum).toEqual(jasmine.any(Number))
-                expect(timeObj).toEqual(jasmine.any(Date))
+                expect(timeNum).toEqual(jasmine.any(Number));
+                expect(timeObj).toEqual(jasmine.any(Date));
                 done();
             };
             timeline.add(node);
@@ -181,8 +176,9 @@ describe('timeline', function(){
             });
             node.tick = function(node, timeNum, timeObj){
                 time2 = timeNum;
-            }
-
+            };
+            timeline.add(node);
+            timeline.start();
             setTimeout(function(){
                 expect(time1).toBe(time2);
                 done();
@@ -216,7 +212,7 @@ describe('timeline', function(){
     describe('stop', function(){
         it('will stop the tick', function(done){
             node.tick = function(node, timeNum, timeObj){
-            }
+            };
             spyOn(node, 'tick');
             timeline.add(node);
             timeline.start();
@@ -236,7 +232,7 @@ describe('timeline', function(){
     describe('system like time func', function(){
         it('interval', function(done){
 
-            var token = timeline.setInterval(fakeFunc, 200);
+            var token = timeline.setInterval(fakeFunc, 1);
 
             setTimeout(function(){
                 var count = fakeFunc.calls.count(); 
@@ -249,21 +245,21 @@ describe('timeline', function(){
                 setTimeout(function(){
                     expect(fakeFunc.calls.count()).toBe(count);
                     done();
-                }, 400)
+                }, 400);
 
-            }, 500)
+            }, 2500);
         });
 
         it('set timeout', function(done){
-            var token = timeline.setTimeout(fakeFunc, 200);
+            var token = timeline.setTimeout(fakeFunc, 1);
             setTimeout(function(){
                 expect(fakeFunc.calls.count()).toBe(1);
                 done();
-            }, 500)
+            }, 1500);
         });
 
         it('clear timeout', function(done){
-            var token = timeline.setTimeout(fakeFunc, 200);
+            var token = timeline.setTimeout(fakeFunc, 1);
 
             setTimeout(function(){
                 timeline.clearTimeout(token);
@@ -272,7 +268,7 @@ describe('timeline', function(){
             setTimeout(function(){
                 expect(fakeFunc).not.toHaveBeenCalled();
                 done();
-            }, 500)
-        })
+            }, 1500);
+        });
     });
 });
